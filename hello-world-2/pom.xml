@@ -3,8 +3,8 @@
     <modelVersion>4.0.0</modelVersion>
     
     <parent>
-        <groupId>org.carlspring.strongbox</groupId>
-        <artifactId>strongbox-parent</artifactId>
+        <groupId>org.carlspring.strongbox.experimentation</groupId>
+        <artifactId>aggregator-experimentation</artifactId>
         <version>1.0-SNAPSHOT</version>
         <relativePath/>
     </parent>
@@ -14,31 +14,120 @@
     <version>1.0-SNAPSHOT</version>
     
     <name>Strongbox Aggregator Experimentation: Hello, World 2</name>
-
+    <properties>
+        <!-- Used to locate the profile specific configuration file. -->
+        <build.profile.id>dev</build.profile.id>
+        <jacoco.it.execution.data.file>${project.build.directory}/coverage-reports/jacoco-it.exec</jacoco.it.execution.data.file>
+        <jacoco.ut.execution.data.file>${project.build.directory}/coverage-reports/jacoco-ut.exec</jacoco.ut.execution.data.file>
+        <jdk.version>1.7</jdk.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Only unit tests are run by default. -->
+        <skip.integration.tests>true</skip.integration.tests>
+        <skip.unit.tests>false</skip.unit.tests>
+    </properties>
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-            </plugin>
-        </plugins>
+
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>2.15</version>
+                    <executions>
+                        <!--
+                            Ensures that both integration-test and verify goals of the Failsafe Maven
+                            plugin are executed.
+                        -->
+                        <execution>
+                            <id>integration-tests</id>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                            <configuration>
+                                <!-- Sets the VM argument line used when integration tests are run. -->
+                                <argLine>${failsafeArgLine}</argLine>
+                                <!--
+                                    Skips integration tests if the value of skip.integration.tests property
+                                    is true
+                                -->
+                                <skipTests>${skip.integration.tests}</skipTests>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.15</version>
+                    <configuration>
+                        <!-- Sets the VM argument line used when unit tests are run. -->
+                        <argLine>${surefireArgLine}</argLine>
+                        <!-- Skips unit tests if the value of skip.unit.tests property is true -->
+                        <skipTests>${skip.unit.tests}</skipTests>
+                        <!-- Excludes integration tests when unit tests are run. -->
+                        <!--<excludes>
+                            <exclude>**/IT*.java</exclude>
+                        </excludes>-->
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.7.5.201505241946</version>
+                    <executions>
+                        <execution>
+                            <id>pre-unit-test</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                            <configuration>
+                                <destFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</destFile>
+
+                                <propertyName>surefireArgLine</propertyName>
+                            </configuration>
+                        </execution>
+
+                        <execution>
+                            <id>post-unit-test</id>
+                            <phase>test</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                            <configuration>
+                                <dataFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</dataFile>
+                                <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                    </configuration>
+                </plugin>
+            </plugins>
+
     </build>
 
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
-            <version>${version.hamcrest}</version>
+            <version>1.3</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
-    <repositories>
+  <repositories>
         <repository>
             <id>releases</id>
             <url>http://localhost:48080/storages/storage0/releases/</url>
