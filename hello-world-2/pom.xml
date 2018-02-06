@@ -1,12 +1,12 @@
 <project>
 
     <modelVersion>4.0.0</modelVersion>
-    
+
     <parent>
         <groupId>org.carlspring.strongbox.experimentation</groupId>
         <artifactId>aggregator-experimentation</artifactId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath/>
+
     </parent>
 
     <groupId>org.carlspring.strongbox.experimentation</groupId>
@@ -16,52 +16,31 @@
     <name>Strongbox Aggregator Experimentation: Hello, World 2</name>
     <properties>
         <!-- Used to locate the profile specific configuration file. -->
-        <build.profile.id>dev</build.profile.id>
-        <jacoco.it.execution.data.file>${project.build.directory}/coverage-reports/jacoco-it.exec</jacoco.it.execution.data.file>
-        <jacoco.ut.execution.data.file>${project.build.directory}/coverage-reports/jacoco-ut.exec</jacoco.ut.execution.data.file>
-        <jdk.version>1.7</jdk.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <skip.integration.tests>true</skip.integration.tests>
-        <skip.unit.tests>false</skip.unit.tests>
-    </properties>
-    <profiles>
-        <profile>
-            <id>all-tests</id>
-            <properties>
-                <build.profile.id>all-tests</build.profile.id>
-                <skip.integration.tests>false</skip.integration.tests>
-                <skip.unit.tests>false</skip.unit.tests>
-            </properties>
-        </profile>
-        <profile>
-            <id>dev</id>
-        </profile>
-        <profile>
-            <id>integration-test</id>
-            <properties>
-                <build.profile.id>integration-test</build.profile.id>
-                <skip.integration.tests>true</skip.integration.tests>
-                <skip.unit.tests>false</skip.unit.tests>
-            </properties>
-        </profile>
-    </profiles>
-    <build>
 
+    </properties>
+
+    <build>
         <plugins>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.5.201505241946</version>
+                <version>0.8.0</version>
                 <executions>
                     <execution>
-                        <id>pre-unit-test</id>
+                        <id>prepare-agent</id>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
                         <configuration>
-                            <destFile>${jacoco.ut.execution.data.file}</destFile>
-                            <propertyName>surefireArgLine</propertyName>
+                            <propertyName>jacoco.agent.ut.arg</propertyName>
                         </configuration>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
                     </execution>
                     <execution>
                         <id>post-unit-test</id>
@@ -70,30 +49,11 @@
                             <goal>report</goal>
                         </goals>
                         <configuration>
-                            <dataFile>${jacoco.ut.execution.data.file}</dataFile>
-                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>pre-integration-test</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                        <configuration>
-                            <destFile>${jacoco.it.execution.data.file}</destFile>
-                            <propertyName>failsafeArgLine</propertyName>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>post-integration-test</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                        <configuration>
-                            <dataFile>${jacoco.it.execution.data.file}</dataFile>
-                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
+                            <!-- Sets the path to the file which contains the execution data. -->
+
+                            <dataFile>target/jacoco.exec</dataFile>
+                            <!-- Sets the output directory for the code coverage report. -->
+                            <outputDirectory>target/jacoco-ut</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -101,41 +61,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.15</version>
                 <configuration>
-                    <argLine>${surefireArgLine}</argLine>
-                    <skipTests>${skip.unit.tests}</skipTests>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.15</version>
-                <executions>
-                    <execution>
-                        <id>integration-tests</id>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                        <configuration>
-                            <argLine>${failsafeArgLine}</argLine>
-                            <skipTests>${skip.integration.tests}</skipTests>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <argLine>${jacoco.agent.ut.arg}</argLine>
                 </configuration>
             </plugin>
         </plugins>
-
     </build>
+
 
     <dependencies>
         <dependency>
