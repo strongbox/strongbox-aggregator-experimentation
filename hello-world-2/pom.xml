@@ -15,8 +15,18 @@
     
     <name>Strongbox Aggregator Experimentation: Hello, World 2</name>
     <properties>
-        <!-- Used to locate the profile specific configuration file. -->
-
+        <coverage.reports.dir>
+            ${basedir}/target/coverage-reports
+        </coverage.reports.dir>
+        <sonar.jacoco.reportPath>
+            ${coverage.reports.dir}/jacoco-unit.exec
+        </sonar.jacoco.reportPath>
+        <sonar.jacoco.itReportPath>
+            ${coverage.reports.dir}/jacoco-it.exec
+        </sonar.jacoco.itReportPath>
+        <sonar.jacoco.jar>
+            ${basedir}/lib/jacocoagent.jar
+        </sonar.jacoco.jar>
     </properties>
 
     <build>
@@ -63,7 +73,38 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <argLine>${jacoco.agent.ut.arg}</argLine>
+                    <!--<excludedGroups>org.carlspring.strongbox.test.IntegrationTest</excludedGroups>-->
+                    <includes>
+                        <include>**/*.class</include>
+                    </includes>
+\                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.20.1</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.surefire</groupId>
+                        <artifactId>surefire-junit47</artifactId>
+                        <version>2.20.1</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <groups>org.carlspring.strongbox.test.IntegrationTest</groups>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                        <configuration>
+                            <argLine>${jacoco.agent.ut.arg}</argLine>
+                            <includes>
+                                <include>**/*.class</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
