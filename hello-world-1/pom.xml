@@ -15,18 +15,11 @@
 
     <name>Strongbox Aggregator Experimentation: Hello, World 1</name>
     <properties>
-        <coverage.reports.dir>
-            ${basedir}/target/coverage-reports
-        </coverage.reports.dir>
-        <sonar.jacoco.reportPath>
-            ${coverage.reports.dir}/jacoco-unit.exec
-        </sonar.jacoco.reportPath>
-        <sonar.jacoco.itReportPath>
-            ${coverage.reports.dir}/jacoco-it.exec
-        </sonar.jacoco.itReportPath>
-        <sonar.jacoco.jar>
-            ${basedir}/lib/jacocoagent.jar
-        </sonar.jacoco.jar>
+        <jacoco.outputDir>${project.build.directory}/jacoco</jacoco.outputDir>
+        <jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
+        <jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
+        <sonar.jacoco.reportPath>${jacoco.outputDir}/${jacoco.out.ut.file}</sonar.jacoco.reportPath>
+        <sonar.jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</sonar.jacoco.itReportPath>
     </properties>
 
     <build>
@@ -36,6 +29,7 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.0</version>
                 <executions>
+
                     <execution>
                         <id>prepare-agent</id>
                         <goals>
@@ -72,11 +66,13 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>${jacoco.agent.ut.arg}</argLine>
+                    <argLine>-Xmx1G -XX:MaxPermSize=512m -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled ${jacoco.agent.ut.arg}</argLine>
                     <includes>
                         <include>**/*.class</include>
                     </includes>
-                    
+                    <excludes>
+                        <exclude>**/*IntegrationTest*</exclude>
+                    </excludes>
                 </configuration>
 
             </plugin>
@@ -97,13 +93,13 @@
                     <execution>
                         <goals>
                             <goal>integration-test</goal>
+                            <goal>verify</goal>
 
                         </goals>
                         <configuration>
-                            <argLine>${jacoco.agent.ut.arg}</argLine>
-                            <argLine>-javaagent:${sonar.jacoco.jar},destfile=${sonar.jacoco.itReportPath},includes=org.*</argLine>
+                            <argLine>-Xmx1G -XX:MaxPermSize=512m -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled ${jacoco.agent.ut.arg}</argLine>
                             <includes>
-                                <include>**/*.class</include>
+                                <include>**/*IntegrationTest*</include>
                             </includes>
                         </configuration>
                     </execution>

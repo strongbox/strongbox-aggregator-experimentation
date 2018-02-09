@@ -1,10 +1,8 @@
 package org.carlspring.strongbox.test;
 
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import static org.junit.Assert.assertTrue;
 
-@Category(IntegrationTest.class)
 public class HelloWorld2TestIT
 {
 
