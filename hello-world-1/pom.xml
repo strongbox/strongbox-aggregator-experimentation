@@ -121,12 +121,6 @@
             <version>1.3</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>ae.teletronics.nlp</groupId>
-            <artifactId>categorisation</artifactId>
-            <version>1.7-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
 
     </dependencies>
 
